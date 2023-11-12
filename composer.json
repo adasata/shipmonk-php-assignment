@@ -1,0 +1,28 @@
+{
+    "name": "santadam/sorted-linked-list",
+    "description": "ShipMonk PHP assignment: Sorted linked list",
+    "type": "library",
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.7",
+        "phpunit/phpunit": "^10.4",
+        "phpstan/phpstan": "^1.10"
+    },
+    "license": "MIT",
+    "autoload": {
+        "classmap": [
+            "src/"
+        ],
+        "psr-4": {
+            "Santadam\\SortedLinkedList\\": "src/",
+            "Santadam\\SortedLinkedList\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Adam Santa",
+            "email": "adamsanta01@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
