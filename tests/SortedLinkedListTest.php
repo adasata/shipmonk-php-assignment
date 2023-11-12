@@ -82,4 +82,13 @@ class SortedLinkedListTest extends TestCase
 
         $this->assertTrue($list->toArray() === [3, 4, 5, 6, 6, 7]);
     }
+
+    public function testFromArrayReverse(): void
+    {
+        /** @var SortedLinkedList<int> $list */
+        // @phpstan-ignore-next-line
+        $list = SortedLinkedList::fromArray([3, 6, 5, 4, 7, 6], fn (int $a, int $b) => $b < $a);
+
+        $this->assertTrue($list->toArray() === [7, 6, 6, 5, 4, 3]);
+    }
 }

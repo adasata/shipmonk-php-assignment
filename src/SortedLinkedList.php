@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Santadam\SortedLinkedList;
 
+use Closure;
+
 /**
  * @template TElem Data type of the linked list node
  */
@@ -11,6 +13,25 @@ class SortedLinkedList
 {
     /** @var SortedLinkedListNode<TElem>|null $start */
     private ?SortedLinkedListNode $start = null;
+
+    /**
+     * @var callable(TElem, TElem): boolean $elemCmp
+     */
+    private mixed $elemCmp;
+
+    /**
+     * @param null|callable(TElem, TElem): boolean $elemCmp
+     */
+    public function __construct(
+        ?callable $elemCmp = null,
+    ) {
+        /**
+         * @var Closure(TElem, TElem): boolean $defaultElemCmp
+         */
+        $defaultElemCmp = fn ($a, $b) => $a < $b;
+        $this->elemCmp = $elemCmp ?? $defaultElemCmp;
+    }
+
 
     /** @param TElem $elem */
     public function insert(mixed $elem): void
@@ -44,7 +65,7 @@ class SortedLinkedList
         if ($nodeToRemove === null) {
             // Nothing to remove
             return;
-        };
+        }
 
         if ($this->start === $nodeToRemove) {
             // Starting node is being removed
@@ -87,8 +108,8 @@ class SortedLinkedList
         /** @var SortedLinkedListNode<TElem>|null $currNode */
         $currNode = $this->start;
         while ($currNode !== null) {
-            // TODO Custom cmp fn if support for non-primitive types required
-            if ($currNode->getData() === $elem) {
+            // Test for equality
+            if (!($this->elemCmp)($currNode->getData(), $elem) && !($this->elemCmp)($elem, $currNode->getData())) {
                 return $currNode;
             }
             $currNode = $currNode->getNext();
@@ -102,8 +123,8 @@ class SortedLinkedList
      * inserted at the beginning.
      *
      * @param TElem $elem
-     * @return SortedLinkedListNode<TElem>|null Node to become a predcessor. Null if the value should be inserted at the
-     * beginning.
+     * @return SortedLinkedListNode<TElem>|null Node to become a predecessor. Null if the value should be inserted at
+     * the beginning.
      */
     protected function findPredecessor(mixed $elem): ?SortedLinkedListNode
     {
@@ -114,8 +135,7 @@ class SortedLinkedList
         $currNode = $this->start;
         /** @var SortedLinkedListNode<TElem>|null $prevNode */
         $prevNode = null;
-        // TODO Custom cmp fn if support for non-primitive types required
-        while ($currNode !== null && $currNode->getData() < $elem) {
+        while ($currNode !== null && ($this->elemCmp)($currNode->getData(), $elem)) {
             $prevNode = $currNode;
             $currNode = $currNode->getNext();
         }
@@ -130,7 +150,6 @@ class SortedLinkedList
         $res = [];
         /** @var SortedLinkedListNode<TElem> $currNode */
         $currNode = $this->start;
-        // TODO Custom cmp fn if support for non-primitive types required
         while ($currNode->getNext() !== null) {
             $res[] = $currNode->getData();
             $currNode = $currNode->getNext();
@@ -141,12 +160,13 @@ class SortedLinkedList
 
     /**
      * @param TElem[] $array
+     * @param null|callable(TElem, TElem): boolean $elemCmp
      * @return SortedLinkedList<TElem>
      */
-    public static function fromArray(array $array): SortedLinkedList
+    public static function fromArray(array $array, ?callable $elemCmp = null): SortedLinkedList
     {
         /** @var SortedLinkedList<TElem> $list */
-        $list = new SortedLinkedList();
+        $list = new SortedLinkedList($elemCmp);
         foreach ($array as $item) {
             $list->insert($item);
         }
